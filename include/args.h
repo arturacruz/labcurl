@@ -1,8 +1,10 @@
 #ifndef ARGS_H
 #define ARGS_H
 
-#include "../include/string.h"
+#include "string/string.h"
+#include "flag.h"
+#include "vec.h"
 
-string* validate_args(int argc, char** argv);
+vec_t* validate_args(int argc, char** argv);
 
 #endif // !ARGS_H

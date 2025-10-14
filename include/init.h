@@ -2,10 +2,8 @@
 #define INIT_H
 
 #include <curl/curl.h>
-#include <stdio.h>
-#include "../include/string.h"
 
-CURL* curl_init(string* url, string **filename);
+CURL* curl_init(void);
 
 void curl_cleanup(CURL* curl);
 

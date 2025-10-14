@@ -1,27 +1,29 @@
 #include <curl/curl.h>
 
-#include "../include/init.h"
-#include "../include/string.h"
 #include "../include/args.h"
-#include "../include/file.h"
 #include "../include/download.h"
+#include "../include/flag.h"
+#include "../include/vec.h"
+#include "../include/init.h"
+
+#include <stdlib.h>
 
 int main(int argc, char **argv) 
 {
-    // string* url = validate_args(argc, argv);
-    //
-    // string* filename;
-    //
-    // CURL* curl = curl_init(url, &filename);
-    //
-    // file_t* file = file_open(filename);
-    //
-    // download_file(curl, &file, url);
-    
-    // curl_cleanup(curl);
-    //
-    string* a = string_new("abc");
-    string* b = string_new("def");
-    string* c = string_concat(&a, &b);
-    printf("%s\n", c->str);
+    CURL* curl = curl_init();
+
+    vec_t* flag_vec = validate_args(argc, argv);
+
+    flag_t* first_flag = vec_get(flag_vec, 0);
+    if(first_flag->flag == NULL) 
+    {
+        perform_single_download(first_flag->content, curl);
+        vec_destroy(&flag_vec);
+        curl_cleanup(curl);
+        return 0;
+    }
+
+    perform_multiple_download(&flag_vec, curl);
+    curl_cleanup(curl);
+    return 0;
 }

@@ -13,6 +13,8 @@ string* string_from(char* str, int len);
 string* string_alloc(int len);
 string* string_copy(string* s);
 string* string_concat(string** s1, string** s2);
+bool string_compare(string* s1, string *s2);
+bool string_compare_str(string* s1, char *s2);
 void string_replace(string** s, char* ocurr, char with);
 void string_destroy(string** str);
 

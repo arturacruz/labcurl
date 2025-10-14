@@ -1,6 +1,7 @@
 #include "../../include/string/string.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdbool.h>
 
 string* string_new(char* str)
@@ -64,6 +65,36 @@ string* string_concat(string** s1p, string** s2p)
     string_destroy(s1p);
     string_destroy(s2p);
     return new_str;
+}
+
+bool string_compare(string* s1, string *s2)
+{ 
+    for(int i = 0; true; i++)
+    {
+        char s1c = s1->str[i];
+        char s2c = s2->str[i];
+
+        if(s1c == '\0' && s2c == '\0')
+            return true;
+
+        if(s1c == '\0' || s2c == '\0')
+            return false;
+    }
+}
+
+bool string_compare_str(string* s1, char *s2)
+{
+    for(int i = 0; true; i++)
+    {
+        char s1c = s1->str[i];
+        char s2c = s2[i];
+
+        if(s1c == '\0' && s2c == '\0')
+            return true;
+
+        if(s1c == '\0' || s2c == '\0')
+            return false;
+    }
 }
 
 void string_replace(string** s, char* ocurr, char with)

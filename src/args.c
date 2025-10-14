@@ -1,22 +1,63 @@
-#include "../include/string.h"
+#include "../include/string/string.h"
+#include "../include/string/extension.h"
+#include "../include/flag.h"
+#include <stdbool.h>
+#include <string.h>
 #include <stdlib.h>
 #include "../include/io.h"
 
-string* validate_args(int argc, char** argv)
+void check_url(char* ur) 
 {
-    if(argc != 2)
+    string* url = string_new(ur);
+    string* start = get_file_start(url);
+    if(!strcmp(start->str, "http") && !strcmp(start->str, "https")) 
+    {
+        printerr("The received url is invalid, does not start with http:// or https://.");
+        exit(1);
+    }
+    string_destroy(&start);
+    string_destroy(&url);
+}
+
+// Returns the size of arr
+vec_t* validate_args(int argc, char** argv)
+{
+    if(argc <= 1)
     {
         printerr("Incorrect arguments. Usage: labcurl URL\n");  
         exit(1); 
     }
 
-    string* url = string_new(argv[1]);
-    //
-    // if(!string_validate_url_start(url)) 
-    // {
-    //     printerr("The received url is invalid, does not start with http:// or https://.");
-    //     exit(1);
-    // }
+    vec_t* vec = vec_new(FLAG);
+    // If usage is only labcurl URL, no flags.
+    if(argc == 2) 
+    {
+        char* url = argv[1];
+        if(url[0] == '-') 
+        {
+            printerr("Bad usage of flag %s.\n", url);
+            exit(1);
+        }
+        check_url(url);
 
-    return url;
+        vec_add(vec, flag_new(NULL, url));
+        return vec;
+    }
+
+    bool next_flag = false;
+    for(int i = 1; i < argc; i++) 
+    {
+        char* curr = argv[i];
+        if(next_flag) 
+        {
+            vec_add(vec, flag_new(argv[i-1], curr));
+            next_flag = false;
+        }
+        else if(is_flag(curr))
+        {
+            next_flag = true;
+        }
+    }
+
+    return vec;
 }
