@@ -77,9 +77,10 @@ bool string_compare(string* s1, string *s2)
         if(s1c == '\0' && s2c == '\0')
             return true;
 
-        if(s1c == '\0' || s2c == '\0')
+        if(s1c != s2c)
             return false;
     }
+    return true;
 }
 
 bool string_compare_str(string* s1, char *s2)
@@ -92,9 +93,10 @@ bool string_compare_str(string* s1, char *s2)
         if(s1c == '\0' && s2c == '\0')
             return true;
 
-        if(s1c == '\0' || s2c == '\0')
+        if(s1c != s2c)
             return false;
     }
+    return true;
 }
 
 void string_replace(string** s, char* ocurr, char with)

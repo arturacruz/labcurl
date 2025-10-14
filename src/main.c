@@ -5,8 +5,8 @@
 #include "../include/flag.h"
 #include "../include/vec.h"
 #include "../include/init.h"
-
-#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int main(int argc, char **argv) 
 {
@@ -25,5 +25,8 @@ int main(int argc, char **argv)
 
     perform_multiple_download(&flag_vec, curl);
     curl_cleanup(curl);
+
+    // Wait for all children to DIE
+    while(wait(NULL) > 0);
     return 0;
 }

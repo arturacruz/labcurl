@@ -1,5 +1,6 @@
 #include "../include/flag.h"
 #include <stdlib.h>
+#include <string.h>
 #include "../include/string/string.h"
 
 flag_t* flag_new(char* flag, char* content)
@@ -20,6 +21,8 @@ flag_t* flag_new(char* flag, char* content)
 
 bool is_flag(char* flag)
 {
+    if(strlen(flag) < 2)
+        return false;
     return flag[0] == '-' && flag[2] == '\0';
 }
 

@@ -6,7 +6,9 @@
 #include "../include/string/string.h"
 #include "../include/vec.h"
 #include "../include/string/extension.h"
+#include "../include/init.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 int download_file(CURL* curl, file_t** file, string* url)
 {
@@ -32,6 +34,19 @@ void perform_single_download(string* url, CURL* curl)
     string_destroy(&filename);
 }
 
+void spawn_child_process(string* url, CURL* curl, vec_t** vecp)
+{
+    if(fork() != 0)
+    {
+        return;
+    }
+    printf("Starting download from process %d.\n", getpid());
+    perform_single_download(url, curl);
+    vec_destroy(vecp);
+    curl_cleanup(curl);
+    exit(0);
+}
+
 void perform_multiple_download(vec_t** vecp, CURL* curl)
 {
     file_t* textfile;
@@ -39,7 +54,6 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
     for(int i = 0; i < vec->size; i++)
     {
         flag_t* curr = vec_get(vec, i);
-
         // NO Flag
         if(curr == NULL)
         {
@@ -49,7 +63,7 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
 
         // -f FLAG
         //
-        if(string_compare_str(curr->flag, "-f"))
+        else if(string_compare_str(curr->flag, "-f"))
         {
             string* fileext = get_file_extension(curr->content);
             if(!string_compare_str(fileext, ".txt"))
@@ -63,11 +77,16 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
         }
 
         // TODO: -n FLAG
+        else 
+        {
+            printerr("Unknown flag %s.\n", curr->flag->str);
+            exit(1);
+        }
     }
 
     if(textfile == NULL) 
     {
-        printerr("No file to multiple download provided.");
+        printerr("No file to multiple download provided (-f file.txt).");
         exit(1);
     }
 
@@ -76,8 +95,10 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
     for(int i = 0; i < vec_size(urls); i++)
     {
         string* url = vec_get(urls, i);
-        perform_single_download(url, curl);
+        spawn_child_process(url, curl, vecp);
     }
 
     vec_destroy(vecp);
 }
+
+

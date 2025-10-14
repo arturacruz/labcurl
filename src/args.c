@@ -57,6 +57,11 @@ vec_t* validate_args(int argc, char** argv)
         {
             next_flag = true;
         }
+        else 
+        {
+            printerr("Not a valid parameter %s.\n", curr);
+            exit(1);
+        }
     }
 
     return vec;

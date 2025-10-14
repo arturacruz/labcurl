@@ -3,8 +3,17 @@
 string* get_file_extension(string* url) 
 {
     int size = 0;
+    if(url->len == 0)
+    {
+        return string_new("");
+    }
+
     for(int i = url->len - 1; url->str[i] != '.'; i--) 
     {
+        if(i == 0)
+        {
+            return string_new("");
+        }
         size++;
     }
     size++;
@@ -21,9 +30,17 @@ string* get_file_extension(string* url)
 
 string* get_file_start(string* url)
 {
+    if(url->len == 0)
+    {
+        return string_new("");
+    }
     int size = 0;
     for(int i = 0; url->str[i] != ':'; i++)
     {
+        if(i == url->len - 1)
+        {
+            return string_new("");
+        }
         size++;
     }
 
