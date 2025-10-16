@@ -35,6 +35,10 @@ int vec_size(vec_t* vec)
 
 void* vec_get(vec_t* vec, int idx)
 {
+    if(idx > vec->size)
+    {
+        return NULL;
+    }
     return vec->data[idx];
 }
 

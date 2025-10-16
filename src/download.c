@@ -7,6 +7,7 @@
 #include "../include/vec.h"
 #include "../include/string/extension.h"
 #include "../include/init.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -34,23 +35,49 @@ void perform_single_download(string* url, CURL* curl)
     string_destroy(&filename);
 }
 
-void spawn_child_process(string* url, CURL* curl, vec_t** vecp)
+void spawn_child_process(CURL* curl, vec_t** vecp, int start, int limit)
 {
-    if(fork() != 0)
+
+    for(int i = start; i < limit; i++)
     {
-        return;
+        string* url = vec_get(*vecp, i);
+        if(url == NULL)
+        {
+            printf("FATAL: URL is null at %d!\n", i);
+            exit(1);
+        }
+        printf("%d - ", i + 1);
+            
+        perform_single_download(url, curl);
     }
-    printf("Starting download from process %d.\n", getpid());
-    perform_single_download(url, curl);
     vec_destroy(vecp);
     curl_cleanup(curl);
     exit(0);
+}
+
+int* calculate_children_load(int n, int size)
+{
+    int global_load = size / n;
+    int rest = size - (n * global_load);
+    int* loads = malloc(sizeof(int) * n);
+    for(int i = 0; i < n; i++)
+    {
+        int load = global_load;
+        if(rest != 0)
+        {
+            load++;
+            rest--;
+        }
+        loads[i] = load;
+    }
+    return loads;
 }
 
 void perform_multiple_download(vec_t** vecp, CURL* curl)
 {
     file_t* textfile;
     vec_t* vec = *vecp;
+    int n = 4;
     for(int i = 0; i < vec->size; i++)
     {
         flag_t* curr = vec_get(vec, i);
@@ -76,7 +103,18 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
             string_destroy(&fileext);
         }
 
-        // TODO: -n FLAG
+        // -n FLAG
+        
+        else if(string_compare_str(curr->flag, "-n"))
+        {
+            int res = atoi(curr->content->str);
+            if(res == 0)
+            {
+                printerr("Error using %s as -n flag. N should be a number.\n", curr->content->str);
+                exit(1);
+            }
+            n = res;
+        }
         else 
         {
             printerr("Unknown flag %s.\n", curr->flag->str);
@@ -90,14 +128,24 @@ void perform_multiple_download(vec_t** vecp, CURL* curl)
         exit(1);
     }
 
-    
     vec_t* urls = parse_url_file(&textfile);
-    for(int i = 0; i < vec_size(urls); i++)
-    {
-        string* url = vec_get(urls, i);
-        spawn_child_process(url, curl, vecp);
-    }
+    int size = vec_size(urls);
+    int* loads = calculate_children_load(n, size);
+    int end = 0;
 
+    for(int i = 0; i < n; i++)
+    {
+        int load = loads[i];
+        pid_t pid = fork();
+        if(pid == 0)
+        {
+            spawn_child_process(curl, &urls, end, end + load);
+        }
+        end += load;
+    }
+    free(loads);
+
+    vec_destroy(&urls);
     vec_destroy(vecp);
 }
 
