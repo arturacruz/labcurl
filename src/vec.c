@@ -1,6 +1,6 @@
 #include "../include/vec.h"
 #include "../include/string/string.h"
-#include "../include/flag.h"
+#include "../include/flag/flag.h"
 #include <stdlib.h>
 
 void vec_expand(vec_t* vec)

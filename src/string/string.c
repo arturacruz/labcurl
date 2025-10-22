@@ -1,7 +1,6 @@
 #include "../../include/string/string.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdbool.h>
 
 string* string_new(char* str)

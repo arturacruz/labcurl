@@ -1,6 +1,6 @@
 #include "../include/string/string.h"
 #include "../include/string/extension.h"
-#include "../include/flag.h"
+#include "../include/flag/flag.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -65,4 +65,45 @@ vec_t* validate_args(int argc, char** argv)
     }
 
     return vec;
+}
+
+void validate_flags(vec_t** flags, int* n, file_t** file)
+{
+    *n = 4;
+    for(int i = 0; i < vec_size(*flags); i++)
+    {
+        flag_t* curr = vec_get(*flags, i);
+        // NO Flag
+        if(curr == NULL)
+        {
+            printf("NO FLAG\n");
+            continue;
+        }
+
+        // -f FLAG
+        //
+        else if(string_compare_str(curr->flag, "-f"))
+        {
+            *file = flag_f(curr);
+        }
+
+        // -n FLAG
+        
+        else if(string_compare_str(curr->flag, "-n"))
+        {
+            *n = flag_n(curr);
+        }
+        else 
+        {
+            printerr("Unknown flag %s.\n", curr->flag->str);
+            exit(1);
+        }
+    }
+
+    if(*file == NULL) 
+    {
+        printerr("No file to multiple download provided (-f file.txt).");
+        exit(1);
+    }
+    vec_destroy(flags);
 }

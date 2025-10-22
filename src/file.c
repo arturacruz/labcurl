@@ -37,6 +37,11 @@ file_t* file_read(string* filename)
 void file_close(file_t** file)
 {
     fclose((*file)->fp);
+}
+
+void file_destroy(file_t** file)
+{
     string_destroy(&(*file)->filename);
     free(*file);
 }
+

@@ -1,8 +1,9 @@
 #include <curl/curl.h>
 
 #include "../include/args.h"
-#include "../include/download.h"
-#include "../include/flag.h"
+#include "../include/download/download.h"
+#include "../include/download/parallel.h"
+#include "../include/flag/flag.h"
 #include "../include/vec.h"
 #include "../include/init.h"
 #include <sys/wait.h>
@@ -25,8 +26,5 @@ int main(int argc, char **argv)
 
     perform_multiple_download(&flag_vec, curl);
     curl_cleanup(curl);
-
-    // Wait for all children to DIE
-    while(wait(NULL) > 0);
     return 0;
 }
